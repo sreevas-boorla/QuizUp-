@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -75,60 +76,32 @@ public class StudentHistoryActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         String currentStudentId = currentUser != null ? currentUser.getUid() : null;
 
-        final boolean[] dataLoaded = {false};
-
-        // Fallback timer if Firebase is offline / demo mode
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            if (!dataLoaded[0]) {
-                dataLoaded[0] = true;
-                pbLoading.setVisibility(View.GONE);
-                if (progressList.isEmpty()) {
-                    populateDefaultProgress();
-                }
-            }
-        }, 1200);
-
         mResultsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                dataLoaded[0] = true;
                 pbLoading.setVisibility(View.GONE);
                 progressList.clear();
 
                 for (DataSnapshot item : snapshot.getChildren()) {
                     QuizResult r = item.getValue(QuizResult.class);
                     if (r != null) {
-                        if (currentStudentId == null || r.getStudentId() == null || r.getStudentId().equals(currentStudentId) || r.getStudentId().equals("student_demo")) {
+                        if (currentStudentId != null && currentStudentId.equals(r.getStudentId())) {
                             progressList.add(r);
                         }
                     }
                 }
 
-                if (progressList.isEmpty()) {
-                    populateDefaultProgress();
-                } else {
-                    Collections.reverse(progressList); // Most recent first
-                    updateUIWithResults();
-                }
+                Collections.reverse(progressList); // Most recent first
+                updateUIWithResults();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                dataLoaded[0] = true;
                 pbLoading.setVisibility(View.GONE);
-                if (progressList.isEmpty()) {
-                    populateDefaultProgress();
-                }
+                Toast.makeText(StudentHistoryActivity.this, "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                updateUIWithResults();
             }
         });
-    }
-
-    private void populateDefaultProgress() {
-        progressList.clear();
-        progressList.add(new QuizResult("p1", "quiz_java_01", "Java Basics Exam", "student_demo", "Rahul Sharma", "rahul@student.edu", 5, 5, System.currentTimeMillis() - 3600000));
-        progressList.add(new QuizResult("p2", "quiz_android_02", "Android Architecture & Lifecycle", "student_demo", "Rahul Sharma", "rahul@student.edu", 4, 5, System.currentTimeMillis() - 86400000));
-        progressList.add(new QuizResult("p3", "quiz_dsa_03", "Data Structures & Algorithms", "student_demo", "Rahul Sharma", "rahul@student.edu", 8, 10, System.currentTimeMillis() - 172800000));
-        updateUIWithResults();
     }
 
     private void updateUIWithResults() {

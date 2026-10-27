@@ -96,26 +96,17 @@ public class StudentExamActivity extends AppCompatActivity {
         btnOptionD.setOnClickListener(v -> handleOptionSelection(4));
     }
 
+    private boolean isExamSessionStarted = false;
+
     private void loadQuizQuestions() {
-        final boolean[] questionsLoaded = {false};
-
-        // Offline / Emulator fallback timer (1s)
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            if (!questionsLoaded[0]) {
-                questionsLoaded[0] = true;
-                if (questionList.isEmpty()) {
-                    populateDefaultQuestions();
-                    startExamSession();
-                }
-            }
-        }, 1000);
-
         mQuizQuestionsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                questionsLoaded[0] = true;
-                questionList.clear();
+                if (isExamSessionStarted) {
+                    return; // Prevent duplicate starts from late events
+                }
 
+                questionList.clear();
                 if (snapshot.exists()) {
                     for (DataSnapshot item : snapshot.getChildren()) {
                         Question q = item.getValue(Question.class);
@@ -126,29 +117,30 @@ public class StudentExamActivity extends AppCompatActivity {
                 }
 
                 if (questionList.isEmpty()) {
-                    populateDefaultQuestions();
+                    new AlertDialog.Builder(StudentExamActivity.this)
+                            .setTitle("No Questions Available")
+                            .setMessage("This quiz does not have any questions uploaded by the instructor yet.")
+                            .setCancelable(false)
+                            .setPositiveButton("Return", (d, w) -> finish())
+                            .show();
+                    return;
                 }
+
+                isExamSessionStarted = true;
                 startExamSession();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                questionsLoaded[0] = true;
-                if (questionList.isEmpty()) {
-                    populateDefaultQuestions();
-                }
-                startExamSession();
+                if (isExamSessionStarted) return;
+                new AlertDialog.Builder(StudentExamActivity.this)
+                        .setTitle("Database Error")
+                        .setMessage("Failed to load questions from Firebase: " + error.getMessage())
+                        .setCancelable(false)
+                        .setPositiveButton("OK", (d, w) -> finish())
+                        .show();
             }
         });
-    }
-
-    private void populateDefaultQuestions() {
-        questionList.clear();
-        questionList.add(new Question("q1", "What is the size of an int data type in Java?", "16 bits", "8 bits", "32 bits", "64 bits", 3));
-        questionList.add(new Question("q2", "Which keyword is used to inherit a class in Java?", "implements", "extends", "inherits", "instanceof", 2));
-        questionList.add(new Question("q3", "Which collection in Java guarantees unique elements without duplicates?", "ArrayList", "HashSet", "LinkedList", "Vector", 2));
-        questionList.add(new Question("q4", "What is the default value of a boolean primitive in Java?", "true", "false", "null", "0", 2));
-        questionList.add(new Question("q5", "Which method serves as the standard execution entry point for Java applications?", "public static void main(String[] args)", "public void start()", "public run()", "public static init()", 1));
     }
 
     private void startExamSession() {
@@ -258,14 +250,30 @@ public class StudentExamActivity extends AppCompatActivity {
             resultId = "res_" + System.currentTimeMillis();
         }
 
-        // Save result record into Firebase Realtime Database
         QuizResult result = new QuizResult(resultId, quizId, quizTitle, studentId, studentName, studentEmail, score, totalQuestions, System.currentTimeMillis());
-        mResultsRef.child(resultId).setValue(result);
 
-        showResultDialog(timedOut, score, totalQuestions);
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(StudentExamActivity.this);
+        progressDialog.setMessage("Recording marks to Firebase...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        final String finalResultId = resultId;
+        mResultsRef.child(resultId).setValue(result)
+                .addOnSuccessListener(aVoid -> {
+                    if (!isFinishing()) {
+                        progressDialog.dismiss();
+                        showResultDialog(timedOut, score, totalQuestions, true, null);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (!isFinishing()) {
+                        progressDialog.dismiss();
+                        showResultDialog(timedOut, score, totalQuestions, false, e.getMessage());
+                    }
+                });
     }
 
-    private void showResultDialog(boolean timedOut, int score, int total) {
+    private void showResultDialog(boolean timedOut, int score, int total, boolean isSaved, String errorMsg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_exam_result, null);
@@ -286,14 +294,18 @@ public class StudentExamActivity extends AppCompatActivity {
         int percent = total > 0 ? (int) Math.round(((double) score / total) * 100) : 0;
         boolean passed = percent >= 60;
 
-        if (timedOut) {
+        if (!isSaved) {
+            tvHeadline.setText("Save Warning!");
+            tvHeadline.setTextColor(Color.parseColor("#D32F2F"));
+            tvSummaryNote.setText("Result failed to record into Firebase (" + (errorMsg != null ? errorMsg : "Network error") + "). Please verify your connection.");
+        } else if (timedOut) {
             tvHeadline.setText("Time Up! Test Submitted");
             tvHeadline.setTextColor(Color.parseColor("#D32F2F"));
-            tvSummaryNote.setText("Test automatically closed because the countdown timer expired. Answered questions were evaluated.");
+            tvSummaryNote.setText("Test automatically closed because the countdown timer expired. Marks have been verified and saved to Firebase.");
         } else {
             tvHeadline.setText("Exam Completed!");
             tvHeadline.setTextColor(Color.parseColor("#3B345D"));
-            tvSummaryNote.setText("All questions completed. Your marks have been recorded in your progress history.");
+            tvSummaryNote.setText("All questions completed. Marks verified and recorded in Firebase progress history.");
         }
 
         if (passed) {

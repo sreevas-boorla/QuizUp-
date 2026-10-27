@@ -138,9 +138,10 @@ public class Login extends AppCompatActivity {
                     }
                 }
 
-                // Fall back to selected RadioButton if not in database
                 if (role == null) {
-                    role = rbTeacher.isChecked() ? "teacher" : "student";
+                    Toast.makeText(Login.this, "Access Denied: User profile or role not found in database. Please contact support or re-register.", Toast.LENGTH_LONG).show();
+                    mAuth.signOut();
+                    return;
                 }
 
                 navigateBasedOnRole(role);
@@ -149,9 +150,8 @@ public class Login extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 pbLoading.setVisibility(View.GONE);
-                // Fall back to radio button selection on database read error
-                String fallbackRole = rbTeacher.isChecked() ? "teacher" : "student";
-                navigateBasedOnRole(fallbackRole);
+                Toast.makeText(Login.this, "Security Error: Unable to verify role from database (" + error.getMessage() + ")", Toast.LENGTH_LONG).show();
+                mAuth.signOut();
             }
         });
     }

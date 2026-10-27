@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-2">
+  <div class="bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-xl p-4 shadow-sm max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-[var(--border)] pb-2.5 mb-3">
+      <div>
+        <h2 class="text-sm font-semibold text-[var(--foreground)]">Exam Quiz Android App — Live System Verification</h2>
+        <p class="text-xs text-[var(--muted-foreground)]">Student Portal (Milestone 5) &amp; Teacher Portal (Milestone 4) • AVD Emulator-5554</p>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        Fully Operational
+      </span>
+    </div>
+
+    <!-- Portal Mode Selector -->
+    <div class="flex gap-2 p-1 bg-[var(--background)] rounded-lg border border-[var(--border)] mb-3">
+      <button id="modeStudent" onclick="switchPortal('student')" class="flex-1 py-1 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-sm transition">
+        Student's Portal
+      </button>
+      <button id="modeTeacher" onclick="switchPortal('teacher')" class="flex-1 py-1 text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition">
+        Teacher's Portal
+      </button>
+    </div>
+
+    <!-- Screen Tabs -->
+    <div id="studentTabs" class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 mb-3">
+      <button id="tabStHome" onclick="showScreen('st_home')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-emerald-600 text-white transition shadow-sm truncate">
+        1. Home
+      </button>
+      <button id="tabStSearch" onclick="showScreen('st_search')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate">
+        2. Search
+      </button>
+      <button id="tabStInfo" onclick="showScreen('st_info')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate">
+        3. Rules
+      </button>
+      <button id="tabStExam" onclick="showScreen('st_exam')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate">
+        4. Timed Exam
+      </button>
+      <button id="tabStResult" onclick="showScreen('st_result')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate">
+        5. Result
+      </button>
+      <button id="tabStHist" onclick="showScreen('st_hist')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate">
+        6. History
+      </button>
+    </div>
+
+    <div id="teacherTabs" class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 mb-3 hidden">
+      <button id="tabTcHome" onclick="showScreen('tc_home')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-emerald-600 text-white transition shadow-sm truncate">
+        1. Home
+      </button>
+      <button id="tabTcCreate" onclick="showScreen('tc_create')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate">
+        2. Create
+      </button>
+      <button id="tabTcEmpty" onclick="showScreen('tc_empty')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate">
+        3. Manager
+      </button>
+      <button id="tabTcDialog" onclick="showScreen('tc_dialog')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate">
+        4. Dialog
+      </button>
+      <button id="tabTcQuestions" onclick="showScreen('tc_questions')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate">
+        5. Questions
+      </button>
+      <button id="tabTcScores" onclick="showScreen('tc_scores')" class="py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate">
+        6. Scores
+      </button>
+    </div>
+
+    <!-- Content Area -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+      <!-- Phone Frame -->
+      <div class="flex justify-center">
+        <div class="w-48 h-96 rounded-[28px] border-4 border-slate-300 dark:border-slate-700 bg-black overflow-hidden shadow-md relative flex items-center justify-center">
+          <img id="imgDisplay" src="emulator_student_home.png" class="w-full h-full object-contain" alt="Live Screenshot">
+        </div>
+      </div>
+
+      <!-- Feature Details -->
+      <div class="space-y-2.5 text-xs">
+        <div class="p-3 rounded-lg bg-[var(--background)] border border-[var(--border)]">
+          <div id="featTitle" class="font-semibold text-[var(--foreground)] text-xs mb-1">Student's Portal Home</div>
+          <div id="featDesc" class="text-[11px] text-[var(--muted-foreground)] leading-relaxed">
+            Displays custom App-Bar, quick Progress History option, real-time Search box, and list of Available Quizzes ready for participation.
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-lg bg-[var(--background)] border border-[var(--border)]">
+          <div class="font-semibold text-[var(--foreground)] mb-1.5 text-[11px]">Milestone Verification Checkmarks</div>
+          <div class="space-y-1 text-[11px] text-[var(--muted-foreground)]">
+            <div class="flex items-center justify-between">
+              <span>Custom App-Bar Component:</span>
+              <span class="text-emerald-600 dark:text-emerald-400 font-medium">&#10003; Home, Exam &amp; History</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Search Quizzes Feature:</span>
+              <span class="text-emerald-600 dark:text-emerald-400 font-medium">&#10003; Live Real-Time Filtering</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Quiz Rules &amp; Duration Info:</span>
+              <span class="text-emerald-600 dark:text-emerald-400 font-medium">&#10003; Modal with Start Trigger</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Back-Counting CountDownTimer:</span>
+              <span class="text-emerald-600 dark:text-emerald-400 font-medium">&#10003; Live Active Countdown</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Auto-Advance &amp; Auto-Submit:</span>
+              <span class="text-emerald-600 dark:text-emerald-400 font-medium">&#10003; Option Click &amp; Timeout</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Progress History &amp; Marks:</span>
+              <span class="text-emerald-600 dark:text-emerald-400 font-medium">&#10003; Accuracy &amp; Attended List</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-[11px]">
+          Both Teacher and Student portals are fully implemented and running live on the Android emulator.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPortal = 'student';
+
+    const screens = {
+      // Student screens
+      st_home: {
+        img: 'emulator_student_home.png',
+        title: "Student's Portal Home",
+        desc: "Features custom App-Bar, welcome card, Progress History navigation card, and Available Quizzes list."
+      },
+      st_search: {
+        img: 'emulator_student_search.png',
+        title: "Real-Time Quiz Search",
+        desc: "Filters available quizzes by title or topic as student types. Real-time badge updates with matching count."
+      },
+      st_info: {
+        img: 'emulator_quiz_instructions.png',
+        title: "Quiz Rules & Duration Modal",
+        desc: "Displays quiz title, subject, total questions count, time limit (duration), important exam instructions, and START button."
+      },
+      st_exam: {
+        img: 'emulator_student_exam.png',
+        title: "Timed Exam Session",
+        desc: "Prominent back-counting CountDownTimer, Question counter, completion progress bar, question text, and selectable options A-D."
+      },
+      st_result: {
+        img: 'emulator_exam_result.png',
+        title: "Exam Completion & Scorecard",
+        desc: "Calculates total score (5/5), percentage (100% PASSED), records marks into Firebase, and offers navigation to Progress History."
+      },
+      st_hist: {
+        img: 'emulator_student_history.png',
+        title: "My Progress History",
+        desc: "Custom App-Bar with Overall Performance Overview (Tests Taken, Passed, Avg Accuracy) and RecyclerView of attended quizzes."
+      },
+
+      // Teacher screens
+      tc_home: {
+        img: 'emulator_teacher_home.png',
+        title: "Teacher's Portal Home",
+        desc: "Custom green App-Bar with logout, 'Create a New Quiz' card, and 'Quiz History' card."
+      },
+      tc_create: {
+        img: 'emulator_create_quiz.png',
+        title: "Create Quiz Activity",
+        desc: "Configures examination title, subject/topic, and auto-initializes the quiz record."
+      },
+      tc_empty: {
+        img: 'emulator_manage_quiz_empty.png',
+        title: "Question Manager (Empty State)",
+        desc: "Displays quiz summary card, question counter badge, '+ ADD QUESTION' button, and empty placeholder illustration."
+      },
+      tc_dialog: {
+        img: 'emulator_add_question_dialog.png',
+        title: "Add Question Dialog",
+        desc: "Modal dialog with inputs for Question Statement, Options A through D, and a RadioGroup to mark the correct answer."
+      },
+      tc_questions: {
+        img: 'emulator_question_added.png',
+        title: "RecyclerView Question Cards",
+        desc: "Shows added questions in styled Material Cards with Q number, options list, green correct answer badge, and delete button."
+      },
+      tc_scores: {
+        img: 'emulator_student_scores.png',
+        title: "Student Scores Dialog",
+        desc: "Displays previous quizzes and opens a student evaluation dialog showing participant names, timestamps, and scores."
+      }
+    };
+
+    function switchPortal(portal) {
+      currentPortal = portal;
+      const bSt = document.getElementById('modeStudent');
+      const bTc = document.getElementById('modeTeacher');
+      const stTabs = document.getElementById('studentTabs');
+      const tcTabs = document.getElementById('teacherTabs');
+
+      if (portal === 'student') {
+        bSt.className = "flex-1 py-1 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-sm transition";
+        bTc.className = "flex-1 py-1 text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition";
+        stTabs.classList.remove('hidden');
+        tcTabs.classList.add('hidden');
+        showScreen('st_home');
+      } else {
+        bTc.className = "flex-1 py-1 text-xs font-bold rounded-md bg-emerald-600 text-white shadow-sm transition";
+        bSt.className = "flex-1 py-1 text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition";
+        tcTabs.classList.remove('hidden');
+        stTabs.classList.add('hidden');
+        showScreen('tc_home');
+      }
+    }
+
+    const studentTabsList = ['st_home', 'st_search', 'st_info', 'st_exam', 'st_result', 'st_hist'];
+    const teacherTabsList = ['tc_home', 'tc_create', 'tc_empty', 'tc_dialog', 'tc_questions', 'tc_scores'];
+
+    function showScreen(key) {
+      const img = document.getElementById('imgDisplay');
+      const title = document.getElementById('featTitle');
+      const desc = document.getElementById('featDesc');
+
+      const activeClass = "py-1 px-1 text-[11px] font-semibold rounded-lg bg-emerald-600 text-white transition shadow-sm truncate";
+      const inactiveClass = "py-1 px-1 text-[11px] font-semibold rounded-lg bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] transition border border-[var(--border)] truncate";
+
+      const list = key.startsWith('st_') ? studentTabsList : teacherTabsList;
+      list.forEach(item => {
+        const idMap = {
+          st_home: 'tabStHome', st_search: 'tabStSearch', st_info: 'tabStInfo',
+          st_exam: 'tabStExam', st_result: 'tabStResult', st_hist: 'tabStHist',
+          tc_home: 'tabTcHome', tc_create: 'tabTcCreate', tc_empty: 'tabTcEmpty',
+          tc_dialog: 'tabTcDialog', tc_questions: 'tabTcQuestions', tc_scores: 'tabTcScores'
+        };
+        const el = document.getElementById(idMap[item]);
+        if (el) {
+          el.className = (item === key) ? activeClass : inactiveClass;
+        }
+      });
+
+      if (screens[key]) {
+        img.src = screens[key].img;
+        title.textContent = screens[key].title;
+        desc.textContent = screens[key].desc;
+      }
+    }
+  </script>
+</body>
+</html>

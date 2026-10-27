@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -131,23 +132,10 @@ public class StudentHomeActivity extends AppCompatActivity implements AvailableQ
 
     private void loadAvailableQuizzes() {
         pbLoading.setVisibility(View.VISIBLE);
-        final boolean[] loaded = {false};
-
-        // Fallback timer if Firebase is offline
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            if (!loaded[0]) {
-                loaded[0] = true;
-                pbLoading.setVisibility(View.GONE);
-                if (quizList.isEmpty()) {
-                    populateDefaultQuizzes();
-                }
-            }
-        }, 1200);
 
         mQuizzesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                loaded[0] = true;
                 pbLoading.setVisibility(View.GONE);
                 quizList.clear();
 
@@ -158,32 +146,17 @@ public class StudentHomeActivity extends AppCompatActivity implements AvailableQ
                     }
                 }
 
-                if (quizList.isEmpty()) {
-                    populateDefaultQuizzes();
-                } else {
-                    quizAdapter.updateList(quizList);
-                    updateSearchState();
-                }
+                quizAdapter.updateList(quizList);
+                updateSearchState();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                loaded[0] = true;
                 pbLoading.setVisibility(View.GONE);
-                if (quizList.isEmpty()) {
-                    populateDefaultQuizzes();
-                }
+                Toast.makeText(StudentHomeActivity.this, "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                updateSearchState();
             }
         });
-    }
-
-    private void populateDefaultQuizzes() {
-        quizList.clear();
-        quizList.add(new Quiz("quiz_java_01", "Java Basics Exam", "Computer Science", "teacher_01", "Teacher", System.currentTimeMillis() - 3600000, 5));
-        quizList.add(new Quiz("quiz_android_02", "Android Architecture & Lifecycle", "Android Development", "teacher_01", "Teacher", System.currentTimeMillis() - 86400000, 5));
-        quizList.add(new Quiz("quiz_dsa_03", "Data Structures & Algorithms", "Algorithms", "teacher_01", "Teacher", System.currentTimeMillis() - 172800000, 10));
-        quizAdapter.updateList(quizList);
-        updateSearchState();
     }
 
     @Override

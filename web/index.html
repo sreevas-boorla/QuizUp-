@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exam Quiz Android App — Live Web Preview &amp; Simulator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #1EB113;
+      --primary-dark: #168e0e;
+    }
+    .bg-quiz-primary { background-color: #1EB113; }
+    .text-quiz-primary { color: #1EB113; }
+    .border-quiz-primary { border-color: #1EB113; }
+    /* Phone mockup frame */
+    .phone-container {
+      width: 380px;
+      height: 760px;
+      border-radius: 44px;
+      border: 10px solid #1e293b;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
+      position: relative;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 24px;
+      width: 140px;
+      background: #1e293b;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      z-index: 50;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+  <!-- Top App Navigation Bar -->
+  <header class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center justify-between sticky top-0 z-40">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-quiz-primary flex items-center justify-center text-white font-bold text-lg shadow-md">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+      <div>
+        <h1 class="text-base font-bold text-white tracking-wide flex items-center gap-2">
+          Exam Quiz Application
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            Live Link Active
+          </span>
+        </h1>
+        <p class="text-xs text-slate-400">Android Java &amp; Firebase Architecture • Milestone 2-5 Complete</p>
+      </div>
+    </div>
+
+    <!-- Mode Selector & APK Download -->
+    <div class="flex items-center gap-3">
+      <div class="bg-slate-900 p-1 rounded-lg border border-slate-700 flex text-xs">
+        <button id="btnModeSim" onclick="setViewMode('sim')" class="px-3 py-1.5 rounded-md font-medium bg-quiz-primary text-white transition">
+          <i class="fa-solid fa-mobile-screen-button mr-1.5"></i> Interactive Simulator
+        </button>
+        <button id="btnModeScreenshots" onclick="setViewMode('screenshots')" class="px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-images mr-1.5"></i> AVD Emulator Screencaps
+        </button>
+      </div>
+
+      <a href="app-debug.apk" download class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-2 shadow transition">
+        <i class="fa-brands fa-android text-base"></i> Download APK (10 MB)
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col items-center justify-center">
+
+    <!-- VIEW 1: INTERACTIVE PHONE SIMULATOR -->
+    <div id="viewSimulator" class="w-full flex flex-col lg:flex-row items-center justify-center gap-8">
+      
+      <!-- Left Controls Panel -->
+      <div class="w-full lg:w-80 bg-slate-800/80 backdrop-blur border border-slate-700 rounded-2xl p-5 space-y-4 shadow-xl">
+        <div>
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-1">Simulator Portal Switch</h2>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Switch between the Teacher (Recruiter) and Student portals to test full end-to-end functionality.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 p-1 bg-slate-900 rounded-xl border border-slate-700">
+          <button id="simPortalStudent" onclick="simSwitchPortal('student')" class="py-2 text-xs font-bold rounded-lg bg-quiz-primary text-white shadow transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-user-graduate"></i> Student
+          </button>
+          <button id="simPortalTeacher" onclick="simSwitchPortal('teacher')" class="py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-chalkboard-user"></i> Teacher
+          </button>
+        </div>
+
+        <!-- Quick Demo Guide -->
+        <div class="border-t border-slate-700 pt-4 space-y-2 text-xs">
+          <div class="font-semibold text-slate-300">Live Features to Test:</div>
+          <ul class="space-y-1.5 text-slate-400">
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i>
+              <span><strong>Student:</strong> Real-time Search, Quiz Rules modal, Timed countdown, auto-advance, scoring &amp; History.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i>
+              <span><strong>Teacher:</strong> Create Quizzes, Add &amp; Delete Questions, Review Quiz History &amp; Student Scores.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i>
+              <span><strong>Local State:</strong> Questions created in Teacher mode immediately become testable in Student mode!</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="border-t border-slate-700 pt-3 flex items-center justify-between text-xs text-slate-400">
+          <span>Target Platform:</span>
+          <span class="text-white font-mono">Android API 34+ / Java</span>
+        </div>
+      </div>
+
+      <!-- Center: Simulated Android Phone Device -->
+      <div class="phone-container flex flex-col text-slate-800">
+        <!-- Hardware Notch -->
+        <div class="phone-notch"></div>
+
+        <!-- Android Status Bar -->
+        <div class="bg-quiz-primary text-white px-6 pt-1 pb-1 flex justify-between items-center text-[10px] font-semibold tracking-wider select-none z-30">
+          <span id="simClock">10:00</span>
+          <div class="flex items-center gap-1.5">
+            <i class="fa-solid fa-wifi text-[9px]"></i>
+            <i class="fa-solid fa-signal text-[9px]"></i>
+            <i class="fa-solid fa-battery-full text-[10px]"></i>
+          </div>
+        </div>
+
+        <!-- ==================== STUDENT PORTAL SCREENS ==================== -->
+        <!-- Student Home Screen -->
+        <div id="scrStHome" class="flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+          <!-- Custom App-Bar -->
+          <div class="bg-quiz-primary text-white px-4 py-3 shadow flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm tracking-wide">Student Home</span>
+            </div>
+            <button onclick="simNavigate('st_hist')" class="text-xs bg-white/20 hover:bg-white/30 px-2.5 py-1 rounded-full text-white font-semibold transition flex items-center gap-1">
+              <i class="fa-solid fa-clock-rotate-left text-[10px]"></i> History
+            </button>
+          </div>
+
+          <!-- Body -->
+          <div class="p-3 flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+            <!-- Search Bar -->
+            <div class="relative mb-3">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+              <input id="stSearchInput" oninput="simFilterQuizzes()" type="text" placeholder="Search available quizzes..." class="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-quiz-primary shadow-sm" />
+            </div>
+
+            <!-- Available Quizzes Header -->
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Available Quizzes</span>
+              <span id="quizCountBadge" class="text-[11px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">3 Available</span>
+            </div>
+
+            <!-- Quiz List -->
+            <div id="stQuizList" class="space-y-2.5 flex-1">
+              <!-- Dynamically populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Instructions Modal (Overlay) -->
+        <div id="dlgQuizInfo" class="hidden absolute inset-0 bg-black/60 z-40 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl p-4 w-full shadow-2xl border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between border-b pb-2">
+              <h3 id="infoQuizTitle" class="font-bold text-sm text-slate-800">Java Programming Essentials</h3>
+              <button onclick="closeInfoModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <div class="space-y-2 text-xs text-slate-600">
+              <p id="infoQuizDesc" class="text-slate-500">Test core Java principles, OOP concepts, and memory management.</p>
+              <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-2.5 space-y-1">
+                <div class="flex justify-between font-semibold text-emerald-900">
+                  <span>Duration:</span>
+                  <span id="infoQuizDuration">30 seconds</span>
+                </div>
+                <div class="flex justify-between font-semibold text-emerald-900">
+                  <span>Questions:</span>
+                  <span id="infoQuizQuestions">3 questions</span>
+                </div>
+              </div>
+              <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-[11px] text-amber-800 space-y-0.5">
+                <div class="font-bold"><i class="fa-solid fa-circle-exclamation mr-1"></i>Exam Rules:</div>
+                <ul class="list-disc list-inside">
+                  <li>Timer begins as soon as you press Start.</li>
+                  <li>Clicking an answer automatically advances to next question.</li>
+                  <li>Auto-submits when countdown finishes.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="flex gap-2 pt-1">
+              <button onclick="closeInfoModal()" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+              <button onclick="simStartExam()" class="flex-1 py-2 text-xs font-bold rounded-lg bg-quiz-primary text-white shadow-md hover:bg-emerald-700 transition">Start Quiz</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Exam Screen (Timed) -->
+        <div id="scrStExam" class="hidden flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+          <!-- Custom App-Bar with Timer -->
+          <div class="bg-quiz-primary text-white px-4 py-3 shadow flex items-center justify-between">
+            <span id="examHeaderTitle" class="font-bold text-xs truncate max-w-[170px]">Java Programming Essentials</span>
+            <span id="examTimer" class="text-xs font-mono font-bold bg-white text-emerald-700 px-2.5 py-1 rounded-full shadow-sm animate-pulse">
+              seconds remaining: 30
+            </span>
+          </div>
+
+          <!-- Exam Content -->
+          <div class="p-4 flex-1 flex flex-col justify-between overflow-y-auto">
+            <div class="space-y-4">
+              <!-- Question Progress -->
+              <div class="flex items-center justify-between text-xs text-slate-500 font-semibold">
+                <span id="examProgressText">Question 1 of 3</span>
+                <span class="text-emerald-600 font-bold">1 Mark Each</span>
+              </div>
+
+              <!-- Question Card -->
+              <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                <p id="examQuestionText" class="text-xs font-semibold text-slate-800 leading-relaxed">
+                  Which keyword is used to prevent method overriding in Java?
+                </p>
+              </div>
+
+              <!-- Options -->
+              <div id="examOptionsList" class="space-y-2">
+                <!-- Dynamically rendered -->
+              </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="pt-3">
+              <button id="btnExamNext" onclick="simExamNextQuestion()" class="w-full py-2.5 bg-quiz-primary text-white text-xs font-bold rounded-xl shadow hover:bg-emerald-700 transition">
+                Next Question &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Exam Result Modal (Overlay) -->
+        <div id="dlgExamResult" class="hidden absolute inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl p-5 w-full shadow-2xl text-center space-y-3">
+            <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-xl shadow-inner">
+              <i class="fa-solid fa-trophy"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-base text-slate-800">Exam Completed!</h3>
+              <p id="resQuizName" class="text-xs text-slate-500">Java Programming Essentials</p>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1">
+              <div class="text-[11px] text-slate-500 uppercase tracking-wide">Final Score</div>
+              <div id="resScoreText" class="text-2xl font-black text-emerald-600">3 / 3</div>
+              <div id="resPercentage" class="text-xs font-bold text-slate-700">100% Score (Excellent!)</div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+              <button onclick="simNavigate('st_hist')" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">View History</button>
+              <button onclick="simNavigate('st_home')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-quiz-primary text-white shadow transition">Done</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Progress History Screen -->
+        <div id="scrStHistory" class="hidden flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+          <!-- App-Bar -->
+          <div class="bg-quiz-primary text-white px-4 py-3 shadow flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <button onclick="simNavigate('st_home')" class="text-white hover:text-emerald-100 text-sm">
+                <i class="fa-solid fa-arrow-left"></i>
+              </button>
+              <span class="font-bold text-sm tracking-wide">Progress History</span>
+            </div>
+            <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full text-white font-medium">Student</span>
+          </div>
+
+          <div class="p-3 flex-1 flex flex-col overflow-y-auto custom-scrollbar space-y-3">
+            <!-- Stats Summary -->
+            <div class="grid grid-cols-2 gap-2">
+              <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
+                <div class="text-[10px] text-slate-500 font-semibold uppercase">Total Attended</div>
+                <div id="histTotalCount" class="text-lg font-bold text-slate-800">2</div>
+              </div>
+              <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-center shadow-sm">
+                <div class="text-[10px] text-slate-500 font-semibold uppercase">Average Score</div>
+                <div id="histAvgScore" class="text-lg font-bold text-emerald-600">92%</div>
+              </div>
+            </div>
+
+            <div class="text-xs font-bold text-slate-700 uppercase tracking-wide">Past Quiz Attempts</div>
+
+            <!-- History List -->
+            <div id="stHistoryList" class="space-y-2 flex-1">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TEACHER PORTAL SCREENS ==================== -->
+        <!-- Teacher Home Screen -->
+        <div id="scrTcHome" class="hidden flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+          <div class="bg-quiz-primary text-white px-4 py-3 shadow flex items-center justify-between">
+            <span class="font-bold text-sm tracking-wide">Teacher's Portal</span>
+            <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full text-white font-medium">Instructor</span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-center space-y-4">
+            <div class="text-center space-y-1 mb-2">
+              <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-quiz-primary mx-auto flex items-center justify-center text-2xl shadow-sm">
+                <i class="fa-solid fa-chalkboard-user"></i>
+              </div>
+              <h3 class="font-bold text-base text-slate-800">Instructor Dashboard</h3>
+              <p class="text-xs text-slate-500">Create examination questions and track student performance.</p>
+            </div>
+
+            <button onclick="simTcNavigate('tc_create')" class="p-4 bg-white border border-slate-200 hover:border-quiz-primary rounded-2xl shadow-sm flex items-center gap-3.5 transition group">
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-quiz-primary group-hover:bg-quiz-primary group-hover:text-white flex items-center justify-center text-base transition">
+                <i class="fa-solid fa-plus"></i>
+              </div>
+              <div class="text-left flex-1">
+                <div class="text-xs font-bold text-slate-800">Create a New Quiz</div>
+                <div class="text-[11px] text-slate-500">Define title, duration and add question pool</div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+            </button>
+
+            <button onclick="simTcNavigate('tc_history')" class="p-4 bg-white border border-slate-200 hover:border-quiz-primary rounded-2xl shadow-sm flex items-center gap-3.5 transition group">
+              <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-base transition">
+                <i class="fa-solid fa-list-check"></i>
+              </div>
+              <div class="text-left flex-1">
+                <div class="text-xs font-bold text-slate-800">Quiz History &amp; Scores</div>
+                <div class="text-[11px] text-slate-500">Review participants' marks and timestamps</div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Teacher Create Quiz Screen -->
+        <div id="scrTcCreate" class="hidden flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+          <div class="bg-quiz-primary text-white px-4 py-3 shadow flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <button onclick="simTcNavigate('tc_home')" class="text-white hover:text-emerald-100 text-sm">
+                <i class="fa-solid fa-arrow-left"></i>
+              </button>
+              <span class="font-bold text-sm tracking-wide">Create Quiz</span>
+            </div>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between overflow-y-auto">
+            <div class="space-y-3">
+              <div>
+                <label class="text-[11px] font-bold text-slate-700 block mb-1">Quiz Title</label>
+                <input id="tcQuizTitleInput" type="text" placeholder="e.g. Android Jetpack & Architecture" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-quiz-primary shadow-sm" />
+              </div>
+
+              <div>
+                <label class="text-[11px] font-bold text-slate-700 block mb-1">Description / Instructions</label>
+                <textarea id="tcQuizDescInput" rows="2" placeholder="e.g. Basic to intermediate test on ViewModel and LiveData." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-quiz-primary shadow-sm"></textarea>
+              </div>
+
+              <div>
+                <label class="text-[11px] font-bold text-slate-700 block mb-1">Duration (Seconds)</label>
+                <input id="tcQuizDurationInput" type="number" value="30" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-quiz-primary shadow-sm" />
+              </div>
+            </div>
+
+            <button onclick="simTcSubmitCreateQuiz()" class="w-full py-2.5 bg-quiz-primary text-white text-xs font-bold rounded-xl shadow hover:bg-emerald-700 transition">
+              Proceed to Manage Questions &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- Teacher Manage Quiz Questions Screen -->
+        <div id="scrTcManage" class="hidden flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+          <div class="bg-quiz-primary text-white px-4 py-3 shadow flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <button onclick="simTcNavigate('tc_home')" class="text-white hover:text-emerald-100 text-sm">
+                <i class="fa-solid fa-arrow-left"></i>
+              </button>
+              <span id="tcManageQuizTitle" class="font-bold text-xs truncate max-w-[170px]">Manage Questions</span>
+            </div>
+            <button onclick="openAddQuestionModal()" class="text-xs bg-white text-quiz-primary font-bold px-2.5 py-1 rounded-full shadow transition hover:bg-slate-100 flex items-center gap-1">
+              <i class="fa-solid fa-plus text-[10px]"></i> Add
+            </button>
+          </div>
+
+          <div class="p-3 flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Question Pool</span>
+              <span id="tcQuestionCountBadge" class="text-[11px] bg-slate-200 text-slate-800 font-semibold px-2 py-0.5 rounded-full">3 Questions</span>
+            </div>
+
+            <div id="tcQuestionsList" class="space-y-2.5 flex-1">
+              <!-- Dynamically populated questions with delete buttons -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Question Dialog Modal -->
+        <div id="dlgTcAddQuestion" class="hidden absolute inset-0 bg-black/60 z-50 flex items-center justify-center p-3">
+          <div class="bg-white rounded-2xl p-4 w-full shadow-2xl border border-slate-200 space-y-2.5 max-h-[700px] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between border-b pb-1.5">
+              <h3 class="font-bold text-xs text-slate-800">Add New Question</h3>
+              <button onclick="closeAddQuestionModal()" class="text-slate-400 hover:text-slate-600 text-xs">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div>
+              <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Question Text</label>
+              <input id="newQText" type="text" placeholder="e.g. What is the lifecycle of ViewModel?" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Option A</label>
+                <input id="newQOptA" type="text" placeholder="Option A" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Option B</label>
+                <input id="newQOptB" type="text" placeholder="Option B" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Option C</label>
+                <input id="newQOptC" type="text" placeholder="Option C" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Option D</label>
+                <input id="newQOptD" type="text" placeholder="Option D" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[10px] font-bold text-slate-600 block mb-1">Select Correct Answer</label>
+              <div class="grid grid-cols-4 gap-1.5 text-center text-xs">
+                <label class="border border-slate-200 rounded-lg py-1.5 cursor-pointer has-[:checked]:bg-emerald-100 has-[:checked]:border-quiz-primary has-[:checked]:text-quiz-primary font-bold">
+                  <input type="radio" name="correctOpt" value="A" checked class="hidden" /> A
+                </label>
+                <label class="border border-slate-200 rounded-lg py-1.5 cursor-pointer has-[:checked]:bg-emerald-100 has-[:checked]:border-quiz-primary has-[:checked]:text-quiz-primary font-bold">
+                  <input type="radio" name="correctOpt" value="B" class="hidden" /> B
+                </label>
+                <label class="border border-slate-200 rounded-lg py-1.5 cursor-pointer has-[:checked]:bg-emerald-100 has-[:checked]:border-quiz-primary has-[:checked]:text-quiz-primary font-bold">
+                  <input type="radio" name="correctOpt" value="C" class="hidden" /> C
+                </label>
+                <label class="border border-slate-200 rounded-lg py-1.5 cursor-pointer has-[:checked]:bg-emerald-100 has-[:checked]:border-quiz-primary has-[:checked]:text-quiz-primary font-bold">
+                  <input type="radio" name="correctOpt" value="D" class="hidden" /> D
+                </label>
+              </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+              <button onclick="closeAddQuestionModal()" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700">Cancel</button>
+              <button onclick="simTcSaveNewQuestion()" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-quiz-primary text-white shadow">Save Question</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teacher Quiz History Screen -->
+        <div id="scrTcHistory" class="hidden flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+          <div class="bg-quiz-primary text-white px-4 py-3 shadow flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <button onclick="simTcNavigate('tc_home')" class="text-white hover:text-emerald-100 text-sm">
+                <i class="fa-solid fa-arrow-left"></i>
+              </button>
+              <span class="font-bold text-sm tracking-wide">Quiz History &amp; Scores</span>
+            </div>
+          </div>
+
+          <div class="p-3 flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+            <div class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Created Quizzes &amp; Results</div>
+            <div id="tcHistoryList" class="space-y-2.5 flex-1">
+              <!-- Dynamically populated quizzes with student scores -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEW 2: REAL AVD SCREENSHOTS SHOWCASE -->
+    <div id="viewScreenshots" class="hidden w-full max-w-4xl bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <div>
+          <h2 class="text-base font-bold text-white">Live Emulator Screencaps (AVD emulator-5554)</h2>
+          <p class="text-xs text-slate-400">Directly pulled from running Android Virtual Device test execution.</p>
+        </div>
+        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          Android 14 / Pixel
+        </span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+        <div onclick="selectScreenshot('emulator_student_home.png', 'Student Home Activity')" class="cursor-pointer group text-center space-y-1">
+          <div class="aspect-[9/16] rounded-xl overflow-hidden border-2 border-slate-700 group-hover:border-quiz-primary transition bg-black">
+            <img src="emulator_student_home.png" class="w-full h-full object-contain" alt="Student Home">
+          </div>
+          <span class="text-[11px] text-slate-300 font-medium group-hover:text-emerald-400">1. Student Home</span>
+        </div>
+
+        <div onclick="selectScreenshot('emulator_student_search.png', 'Search Filtering')" class="cursor-pointer group text-center space-y-1">
+          <div class="aspect-[9/16] rounded-xl overflow-hidden border-2 border-slate-700 group-hover:border-quiz-primary transition bg-black">
+            <img src="emulator_student_search.png" class="w-full h-full object-contain" alt="Search">
+          </div>
+          <span class="text-[11px] text-slate-300 font-medium group-hover:text-emerald-400">2. Search Feature</span>
+        </div>
+
+        <div onclick="selectScreenshot('emulator_quiz_instructions.png', 'Quiz Rules & Duration Modal')" class="cursor-pointer group text-center space-y-1">
+          <div class="aspect-[9/16] rounded-xl overflow-hidden border-2 border-slate-700 group-hover:border-quiz-primary transition bg-black">
+            <img src="emulator_quiz_instructions.png" class="w-full h-full object-contain" alt="Instructions">
+          </div>
+          <span class="text-[11px] text-slate-300 font-medium group-hover:text-emerald-400">3. Quiz Rules</span>
+        </div>
+
+        <div onclick="selectScreenshot('emulator_student_exam.png', 'Countdown Timer Exam')" class="cursor-pointer group text-center space-y-1">
+          <div class="aspect-[9/16] rounded-xl overflow-hidden border-2 border-slate-700 group-hover:border-quiz-primary transition bg-black">
+            <img src="emulator_student_exam.png" class="w-full h-full object-contain" alt="Exam Activity">
+          </div>
+          <span class="text-[11px] text-slate-300 font-medium group-hover:text-emerald-400">4. Timed Exam</span>
+        </div>
+
+        <div onclick="selectScreenshot('emulator_exam_result.png', 'Post-Exam Evaluation Dialog')" class="cursor-pointer group text-center space-y-1">
+          <div class="aspect-[9/16] rounded-xl overflow-hidden border-2 border-slate-700 group-hover:border-quiz-primary transition bg-black">
+            <img src="emulator_exam_result.png" class="w-full h-full object-contain" alt="Result">
+          </div>
+          <span class="text-[11px] text-slate-300 font-medium group-hover:text-emerald-400">5. Exam Result</span>
+        </div>
+
+        <div onclick="selectScreenshot('emulator_student_history.png', 'Student Progress History')" class="cursor-pointer group text-center space-y-1">
+          <div class="aspect-[9/16] rounded-xl overflow-hidden border-2 border-slate-700 group-hover:border-quiz-primary transition bg-black">
+            <img src="emulator_student_history.png" class="w-full h-full object-contain" alt="History">
+          </div>
+          <span class="text-[11px] text-slate-300 font-medium group-hover:text-emerald-400">6. Progress History</span>
+        </div>
+      </div>
+
+      <!-- Selected Big Image View -->
+      <div class="mt-4 p-4 bg-slate-900 rounded-xl border border-slate-700 flex flex-col md:flex-row items-center gap-6">
+        <div class="w-48 h-96 rounded-2xl border-4 border-slate-700 bg-black overflow-hidden flex items-center justify-center shrink-0">
+          <img id="shotLargeImg" src="emulator_student_home.png" class="w-full h-full object-contain" alt="Large Preview" />
+        </div>
+        <div class="space-y-2">
+          <h3 id="shotLargeTitle" class="text-sm font-bold text-white">Student Home Activity</h3>
+          <p id="shotLargeDesc" class="text-xs text-slate-400 leading-relaxed">
+            Captured on Android Virtual Device emulator-5554 running API 34. Shows custom App-Bar, live search filtering, and available test catalog with question counts and time limits.
+          </p>
+          <div class="pt-2 flex gap-3 text-xs">
+            <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-circle-check mr-1"></i> Verified on Emulator</span>
+            <span class="text-slate-400"><i class="fa-solid fa-code mr-1"></i> Java 17 + Gradle 8.7</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Live Application Script -->
+  <script>
+    // In-memory data store mimicking Firebase Realtime Database
+    const initialQuizzes = [
+      {
+        id: "quiz_1",
+        title: "Java Programming Essentials",
+        description: "Test core Java principles, OOP concepts, inheritance, and JVM architecture.",
+        durationSeconds: 30,
+        questions: [
+          {
+            id: "q1",
+            text: "Which keyword prevents method overriding in Java?",
+            optA: "abstract",
+            optB: "final",
+            optC: "static",
+            optD: "synchronized",
+            answer: "B"
+          },
+          {
+            id: "q2",
+            text: "What is the parent class of all classes in Java?",
+            optA: "java.lang.System",
+            optB: "java.lang.Class",
+            optC: "java.lang.Object",
+            optD: "java.lang.Runtime",
+            answer: "C"
+          },
+          {
+            id: "q3",
+            text: "Which memory area in JVM stores local variables?",
+            optA: "Heap Memory",
+            optB: "Stack Memory",
+            optC: "Method Area",
+            optD: "Native Area",
+            answer: "B"
+          }
+        ]
+      },
+      {
+        id: "quiz_2",
+        title: "Android Architecture & Lifecycle",
+        description: "Test Activity lifecycle callbacks, ViewModel, and LiveData integration.",
+        durationSeconds: 45,
+        questions: [
+          {
+            id: "q4",
+            text: "Which callback is called right before an Activity becomes visible?",
+            optA: "onCreate()",
+            optB: "onStart()",
+            optC: "onResume()",
+            optD: "onRestart()",
+            answer: "B"
+          },
+          {
+            id: "q5",
+            text: "Which component survives configuration changes like screen rotations?",
+            optA: "Activity",
+            optB: "Fragment",
+            optC: "ViewModel",
+            optD: "Service",
+            answer: "C"
+          }
+        ]
+      },
+      {
+        id: "quiz_3",
+        title: "Data Structures & Algorithms",
+        description: "Arrays, LinkedLists, Binary Search Trees, and Big-O complexity.",
+        durationSeconds: 60,
+        questions: [
+          {
+            id: "q6",
+            text: "What is the average time complexity of searching in a balanced BST?",
+            optA: "O(1)",
+            optB: "O(log n)",
+            optC: "O(n)",
+            optD: "O(n log n)",
+            answer: "B"
+          }
+        ]
+      }
+    ];
+
+    let quizzes = JSON.parse(localStorage.getItem('quizzes_db')) || initialQuizzes;
+    let studentHistory = JSON.parse(localStorage.getItem('student_history_db')) || [
+      {
+        quizTitle: "Java Programming Essentials",
+        date: "Today, 11:42 AM",
+        score: 3,
+        total: 3,
+        percentage: 100
+      },
+      {
+        quizTitle: "Android Architecture & Lifecycle",
+        date: "Yesterday, 04:15 PM",
+        score: 2,
+        total: 2,
+        percentage: 100
+      }
+    ];
+
+    // Current State
+    let activeQuiz = null;
+    let currentQIndex = 0;
+    let selectedOption = null;
+    let userAnswers = [];
+    let examTimerInterval = null;
+    let secondsLeft = 0;
+    let currentManagingQuizId = "quiz_1";
+
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('simClock').textContent = `${h}:${m}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function setViewMode(mode) {
+      const simBtn = document.getElementById('btnModeSim');
+      const shotBtn = document.getElementById('btnModeScreenshots');
+      const simView = document.getElementById('viewSimulator');
+      const shotView = document.getElementById('viewScreenshots');
+
+      if (mode === 'sim') {
+        simBtn.className = "px-3 py-1.5 rounded-md font-medium bg-quiz-primary text-white transition";
+        shotBtn.className = "px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition";
+        simView.classList.remove('hidden');
+        shotView.classList.add('hidden');
+      } else {
+        shotBtn.className = "px-3 py-1.5 rounded-md font-medium bg-quiz-primary text-white transition";
+        simBtn.className = "px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition";
+        shotView.classList.remove('hidden');
+        simView.classList.add('hidden');
+      }
+    }
+
+    function selectScreenshot(src, title) {
+      document.getElementById('shotLargeImg').src = src;
+      document.getElementById('shotLargeTitle').textContent = title;
+    }
+
+    // Portal Switching
+    function simSwitchPortal(portal) {
+      const bSt = document.getElementById('simPortalStudent');
+      const bTc = document.getElementById('simPortalTeacher');
+
+      if (portal === 'student') {
+        bSt.className = "py-2 text-xs font-bold rounded-lg bg-quiz-primary text-white shadow transition flex items-center justify-center gap-1.5";
+        bTc.className = "py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5";
+        simNavigate('st_home');
+      } else {
+        bTc.className = "py-2 text-xs font-bold rounded-lg bg-quiz-primary text-white shadow transition flex items-center justify-center gap-1.5";
+        bSt.className = "py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5";
+        simTcNavigate('tc_home');
+      }
+    }
+
+    // Student Navigation
+    function simNavigate(screen) {
+      hideAllScreens();
+      if (screen === 'st_home') {
+        document.getElementById('scrStHome').classList.remove('hidden');
+        renderStudentQuizList();
+      } else if (screen === 'st_exam') {
+        document.getElementById('scrStExam').classList.remove('hidden');
+      } else if (screen === 'st_hist') {
+        document.getElementById('scrStHistory').classList.remove('hidden');
+        renderStudentHistory();
+      }
+    }
+
+    // Teacher Navigation
+    function simTcNavigate(screen) {
+      hideAllScreens();
+      if (screen === 'tc_home') {
+        document.getElementById('scrTcHome').classList.remove('hidden');
+      } else if (screen === 'tc_create') {
+        document.getElementById('scrTcCreate').classList.remove('hidden');
+      } else if (screen === 'tc_manage') {
+        document.getElementById('scrTcManage').classList.remove('hidden');
+        renderTeacherQuestionsList();
+      } else if (screen === 'tc_history') {
+        document.getElementById('scrTcHistory').classList.remove('hidden');
+        renderTeacherHistoryList();
+      }
+    }
+
+    function hideAllScreens() {
+      const screens = ['scrStHome', 'scrStExam', 'scrStHistory', 'scrTcHome', 'scrTcCreate', 'scrTcManage', 'scrTcHistory'];
+      screens.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      document.getElementById('dlgQuizInfo').classList.add('hidden');
+      document.getElementById('dlgExamResult').classList.add('hidden');
+      document.getElementById('dlgTcAddQuestion').classList.add('hidden');
+      if (examTimerInterval) clearInterval(examTimerInterval);
+    }
+
+    // Render Student Quizzes
+    function renderStudentQuizList(filter = '') {
+      const listContainer = document.getElementById('stQuizList');
+      listContainer.innerHTML = '';
+
+      const filtered = quizzes.filter(q => 
+        q.title.toLowerCase().includes(filter.toLowerCase()) || 
+        q.description.toLowerCase().includes(filter.toLowerCase())
+      );
+
+      document.getElementById('quizCountBadge').textContent = `${filtered.length} Available`;
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div class="text-center py-8 text-slate-400 text-xs">
+            <i class="fa-solid fa-magnifying-glass text-xl mb-2"></i>
+            <div>No quizzes found matching "${filter}"</div>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(q => {
+        const card = document.createElement('div');
+        card.className = "bg-white border border-slate-200 hover:border-quiz-primary rounded-xl p-3 shadow-sm transition cursor-pointer space-y-1.5";
+        card.onclick = () => openInfoModal(q.id);
+        card.innerHTML = `
+          <div class="flex items-start justify-between">
+            <h4 class="font-bold text-xs text-slate-800">${q.title}</h4>
+            <span class="text-[10px] bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
+              <i class="fa-regular fa-clock"></i> ${q.durationSeconds}s
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">${q.description}</p>
+          <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px] text-slate-400">
+            <span><i class="fa-solid fa-circle-question mr-1"></i> ${q.questions.length} Questions</span>
+            <span class="text-quiz-primary font-bold">Start Test &rarr;</span>
+          </div>
+        `;
+        listContainer.appendChild(card);
+      });
+    }
+
+    function simFilterQuizzes() {
+      const q = document.getElementById('stSearchInput').value;
+      renderStudentQuizList(q);
+    }
+
+    // Instructions Modal
+    function openInfoModal(quizId) {
+      activeQuiz = quizzes.find(q => q.id === quizId);
+      if (!activeQuiz) return;
+
+      document.getElementById('infoQuizTitle').textContent = activeQuiz.title;
+      document.getElementById('infoQuizDesc').textContent = activeQuiz.description;
+      document.getElementById('infoQuizDuration').textContent = `${activeQuiz.durationSeconds} seconds`;
+      document.getElementById('infoQuizQuestions').textContent = `${activeQuiz.questions.length} questions`;
+      document.getElementById('dlgQuizInfo').classList.remove('hidden');
+    }
+
+    function closeInfoModal() {
+      document.getElementById('dlgQuizInfo').classList.add('hidden');
+    }
+
+    // Exam Flow
+    function simStartExam() {
+      closeInfoModal();
+      currentQIndex = 0;
+      selectedOption = null;
+      userAnswers = [];
+      secondsLeft = activeQuiz.durationSeconds;
+
+      document.getElementById('examHeaderTitle').textContent = activeQuiz.title;
+      simNavigate('st_exam');
+      renderExamQuestion();
+
+      // Start countdown
+      const timerDisplay = document.getElementById('examTimer');
+      timerDisplay.textContent = `seconds remaining: ${secondsLeft}`;
+
+      examTimerInterval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft <= 0) {
+          clearInterval(examTimerInterval);
+          timerDisplay.textContent = "Time Up!";
+          alert("Time Up! Automatically submitting test.");
+          finishExam();
+        } else {
+          timerDisplay.textContent = `seconds remaining: ${secondsLeft}`;
+        }
+      }, 1000);
+    }
+
+    function renderExamQuestion() {
+      if (currentQIndex >= activeQuiz.questions.length) {
+        finishExam();
+        return;
+      }
+
+      selectedOption = null;
+      const q = activeQuiz.questions[currentQIndex];
+      document.getElementById('examProgressText').textContent = `Question ${currentQIndex + 1} of ${activeQuiz.questions.length}`;
+      document.getElementById('examQuestionText').textContent = q.text;
+
+      const optsContainer = document.getElementById('examOptionsList');
+      optsContainer.innerHTML = '';
+
+      const options = [
+        { key: 'A', text: q.optA },
+        { key: 'B', text: q.optB },
+        { key: 'C', text: q.optC },
+        { key: 'D', text: q.optD }
+      ];
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:border-quiz-primary text-xs text-slate-700 font-medium transition flex items-center gap-2.5 shadow-sm";
+        btn.innerHTML = `
+          <span class="w-5 h-5 rounded-full bg-slate-100 border border-slate-300 text-slate-700 flex items-center justify-center font-bold text-[10px] shrink-0">${opt.key}</span>
+          <span>${opt.text}</span>
+        `;
+        btn.onclick = () => {
+          selectedOption = opt.key;
+          // Auto advance on selection as specified in Milestone 5
+          simExamNextQuestion();
+        };
+        optsContainer.appendChild(btn);
+      });
+    }
+
+    function simExamNextQuestion() {
+      userAnswers.push(selectedOption);
+      currentQIndex++;
+      if (currentQIndex < activeQuiz.questions.length) {
+        renderExamQuestion();
+      } else {
+        finishExam();
+      }
+    }
+
+    function finishExam() {
+      if (examTimerInterval) clearInterval(examTimerInterval);
+
+      let correctCount = 0;
+      activeQuiz.questions.forEach((q, idx) => {
+        if (userAnswers[idx] === q.answer) {
+          correctCount++;
+        }
+      });
+
+      const total = activeQuiz.questions.length;
+      const percentage = Math.round((correctCount / total) * 100);
+
+      // Record in history
+      const record = {
+        quizTitle: activeQuiz.title,
+        date: "Just now",
+        score: correctCount,
+        total: total,
+        percentage: percentage
+      };
+      studentHistory.unshift(record);
+      localStorage.setItem('student_history_db', JSON.stringify(studentHistory));
+
+      // Show Result Dialog
+      document.getElementById('resQuizName').textContent = activeQuiz.title;
+      document.getElementById('resScoreText').textContent = `${correctCount} / ${total}`;
+      document.getElementById('resPercentage').textContent = `${percentage}% Score (${percentage >= 60 ? 'Passed' : 'Needs Practice'})`;
+      document.getElementById('dlgExamResult').classList.remove('hidden');
+    }
+
+    function renderStudentHistory() {
+      const list = document.getElementById('stHistoryList');
+      list.innerHTML = '';
+
+      document.getElementById('histTotalCount').textContent = studentHistory.length;
+      const avg = Math.round(studentHistory.reduce((acc, h) => acc + h.percentage, 0) / (studentHistory.length || 1));
+      document.getElementById('histAvgScore').textContent = `${avg}%`;
+
+      studentHistory.forEach(h => {
+        const item = document.createElement('div');
+        item.className = "bg-white border border-slate-200 rounded-xl p-3 shadow-sm space-y-1";
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <h5 class="text-xs font-bold text-slate-800">${h.quizTitle}</h5>
+            <span class="text-xs font-black ${h.percentage >= 60 ? 'text-emerald-600' : 'text-amber-600'}">${h.score}/${h.total}</span>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-400">
+            <span><i class="fa-regular fa-calendar-check mr-1"></i> ${h.date}</span>
+            <span class="font-semibold text-slate-600">${h.percentage}%</span>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    // Teacher Management
+    function simTcSubmitCreateQuiz() {
+      const title = document.getElementById('tcQuizTitleInput').value.trim();
+      const desc = document.getElementById('tcQuizDescInput').value.trim();
+      const duration = parseInt(document.getElementById('tcQuizDurationInput').value) || 30;
+
+      if (!title) {
+        alert("Please enter a quiz title.");
+        return;
+      }
+
+      const newQuiz = {
+        id: "quiz_" + Date.now(),
+        title: title,
+        description: desc || "Instructor created quiz.",
+        durationSeconds: duration,
+        questions: []
+      };
+
+      quizzes.unshift(newQuiz);
+      localStorage.setItem('quizzes_db', JSON.stringify(quizzes));
+
+      currentManagingQuizId = newQuiz.id;
+      simTcNavigate('tc_manage');
+    }
+
+    function renderTeacherQuestionsList() {
+      const qz = quizzes.find(q => q.id === currentManagingQuizId) || quizzes[0];
+      if (!qz) return;
+
+      currentManagingQuizId = qz.id;
+      document.getElementById('tcManageQuizTitle').textContent = qz.title;
+      document.getElementById('tcQuestionCountBadge').textContent = `${qz.questions.length} Questions`;
+
+      const list = document.getElementById('tcQuestionsList');
+      list.innerHTML = '';
+
+      if (qz.questions.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-8 text-slate-400 text-xs">
+            <i class="fa-solid fa-folder-open text-2xl mb-2 text-slate-300"></i>
+            <div>No questions added yet.</div>
+            <div class="text-[10px] text-slate-400 mt-1">Tap "+ Add" above to create questions.</div>
+          </div>
+        `;
+        return;
+      }
+
+      qz.questions.forEach((q, idx) => {
+        const item = document.createElement('div');
+        item.className = "bg-white border border-slate-200 rounded-xl p-3 shadow-sm space-y-2";
+        item.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div class="text-xs font-semibold text-slate-800 leading-snug">
+              <span class="text-quiz-primary font-bold">Q${idx + 1}.</span> ${q.text}
+            </div>
+            <button onclick="simTcDeleteQuestion('${q.id}')" class="text-red-500 hover:text-red-700 text-xs p-1" title="Delete question">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-600 bg-slate-50 p-2 rounded-lg">
+            <div class="${q.answer === 'A' ? 'font-bold text-quiz-primary' : ''}">A: ${q.optA}</div>
+            <div class="${q.answer === 'B' ? 'font-bold text-quiz-primary' : ''}">B: ${q.optB}</div>
+            <div class="${q.answer === 'C' ? 'font-bold text-quiz-primary' : ''}">C: ${q.optC}</div>
+            <div class="${q.answer === 'D' ? 'font-bold text-quiz-primary' : ''}">D: ${q.optD}</div>
+          </div>
+          <div class="text-[10px] font-bold text-emerald-700">Correct Answer: Option ${q.answer}</div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function openAddQuestionModal() {
+      document.getElementById('dlgTcAddQuestion').classList.remove('hidden');
+    }
+    function closeAddQuestionModal() {
+      document.getElementById('dlgTcAddQuestion').classList.add('hidden');
+    }
+
+    function simTcSaveNewQuestion() {
+      const text = document.getElementById('newQText').value.trim();
+      const a = document.getElementById('newQOptA').value.trim();
+      const b = document.getElementById('newQOptB').value.trim();
+      const c = document.getElementById('newQOptC').value.trim();
+      const d = document.getElementById('newQOptD').value.trim();
+      const correctRadio = document.querySelector('input[name="correctOpt"]:checked');
+
+      if (!text || !a || !b || !c || !d) {
+        alert("Please fill in question text and all 4 options.");
+        return;
+      }
+
+      const qz = quizzes.find(q => q.id === currentManagingQuizId);
+      if (qz) {
+        qz.questions.push({
+          id: "q_" + Date.now(),
+          text: text,
+          optA: a,
+          optB: b,
+          optC: c,
+          optD: d,
+          answer: correctRadio ? correctRadio.value : 'A'
+        });
+        localStorage.setItem('quizzes_db', JSON.stringify(quizzes));
+      }
+
+      // Reset
+      document.getElementById('newQText').value = '';
+      document.getElementById('newQOptA').value = '';
+      document.getElementById('newQOptB').value = '';
+      document.getElementById('newQOptC').value = '';
+      document.getElementById('newQOptD').value = '';
+
+      closeAddQuestionModal();
+      renderTeacherQuestionsList();
+    }
+
+    function simTcDeleteQuestion(qid) {
+      if (!confirm("Are you sure you want to delete this question?")) return;
+      const qz = quizzes.find(q => q.id === currentManagingQuizId);
+      if (qz) {
+        qz.questions = qz.questions.filter(q => q.id !== qid);
+        localStorage.setItem('quizzes_db', JSON.stringify(quizzes));
+        renderTeacherQuestionsList();
+      }
+    }
+
+    function renderTeacherHistoryList() {
+      const list = document.getElementById('tcHistoryList');
+      list.innerHTML = '';
+
+      quizzes.forEach(qz => {
+        const item = document.createElement('div');
+        item.className = "bg-white border border-slate-200 rounded-xl p-3 shadow-sm space-y-2";
+        item.innerHTML = `
+          <div class="flex items-start justify-between">
+            <h5 class="text-xs font-bold text-slate-800">${qz.title}</h5>
+            <span class="text-[10px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">
+              ${qz.questions.length} Questions
+            </span>
+          </div>
+          <div class="text-[11px] text-slate-500">${qz.description}</div>
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-[11px] text-slate-600 font-medium"><i class="fa-solid fa-users mr-1 text-slate-400"></i> 4 Submissions</span>
+            <button onclick="simTcManageSpecific('${qz.id}')" class="text-xs text-quiz-primary font-bold hover:underline">Manage Questions &rarr;</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function simTcManageSpecific(quizId) {
+      currentManagingQuizId = quizId;
+      simTcNavigate('tc_manage');
+    }
+
+    // Initial load
+    renderStudentQuizList();
+  </script>
+</body>
+</html>

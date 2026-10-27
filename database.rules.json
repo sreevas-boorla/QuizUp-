@@ -1,0 +1,35 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && (auth.uid === $uid || !data.exists())",
+        ".validate": "newData.hasChildren(['email', 'role']) && (newData.child('role').val() === 'student' || newData.child('role').val() === 'teacher')"
+      }
+    },
+    "quizzes": {
+      ".read": "auth != null",
+      "$quizId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'teacher'",
+        "questions": {
+          ".read": "auth != null",
+          "$questionId": {
+            ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'teacher'",
+            ".validate": "newData.hasChildren(['questionText', 'optionA', 'optionB', 'optionC', 'optionD', 'correctOption'])"
+          }
+        }
+      }
+    },
+    "results": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'teacher'",
+      "$resultId": {
+        ".read": "auth != null && (data.child('studentId').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'teacher')",
+        ".write": "auth != null && (
+          (!data.exists() && newData.child('studentId').val() === auth.uid) ||
+          root.child('users').child(auth.uid).child('role').val() === 'teacher'
+        )",
+        ".validate": "newData.hasChildren(['quizId', 'studentId', 'score', 'totalQuestions', 'timestamp']) && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= newData.child('totalQuestions').val()"
+      }
+    }
+  }
+}
