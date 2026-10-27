@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyFirstApp">
+
+        <!-- Entry / Hello World Screen -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Authentication Activities -->
+        <activity
+            android:name=".Login"
+            android:exported="true"
+            android:label="Login" />
+
+        <activity
+            android:name=".Register"
+            android:exported="false"
+            android:label="Create Account" />
+
+        <!-- Student Portal Activities with custom App-Bar theme -->
+        <activity
+            android:name=".StudentHomeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MyFirstApp.NoActionBar"
+            android:label="Student Portal" />
+
+        <activity
+            android:name=".StudentExamActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyFirstApp.NoActionBar"
+            android:label="Exam Session" />
+
+        <activity
+            android:name=".StudentHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyFirstApp.NoActionBar"
+            android:label="Progress History" />
+
+        <!-- Teacher / Recruiter Portal with custom App-Bar theme -->
+        <activity
+            android:name=".TeacherHomeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MyFirstApp.NoActionBar"
+            android:label="Teacher Portal" />
+
+        <activity
+            android:name=".CreateQuizActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyFirstApp.NoActionBar"
+            android:label="Create Quiz" />
+
+        <activity
+            android:name=".ManageQuizActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyFirstApp.NoActionBar"
+            android:label="Manage Questions" />
+
+        <activity
+            android:name=".TeacherHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyFirstApp.NoActionBar"
+            android:label="Quiz History" />
+
+    </application>
+
+</manifest>

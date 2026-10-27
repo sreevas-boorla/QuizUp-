@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">My First App</string>
+    <string name="hello_world">Hello World</string>
+    
+    <!-- Authentication Strings -->
+    <string name="login_title">Exam Preparation Quiz</string>
+    <string name="login_subtitle">Sign in to take tests or manage quizzes</string>
+    <string name="email_hint">Email Address</string>
+    <string name="password_hint">Password</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_register">Register</string>
+    <string name="role_student">Student</string>
+    <string name="role_teacher">Teacher / Recruiter</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="no_account">Don\'t have an account? Sign Up</string>
+    <string name="have_account">Already have an account? Login</string>
+    <string name="name_hint">Full Name</string>
+    <string name="select_role">Select Role:</string>
+</resources>
